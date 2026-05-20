@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+  <title>USFM Search Tool</title>
+    <style>
+      #book-buttons .btn {
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        padding: 1px 2px;
+        cursor: pointer;
+        user-select: none;
+        background-color: #eee;
+        transition: background-color 0.2s, color 0.2s;
+      }
+
+      #book-buttons .btn input {
+        display: none;  /* hide the actual checkbox */
+      }
+
+      /* Highlight the span when the checkbox is checked */
+      #book-buttons .btn input:checked + span {
+        background-color: #007bff;
+        color: white;
+        border-color: #0056b3;
+      }
+
+      /* Optional: add hover effect */
+      #book-buttons .btn:hover {
+        background-color: #ddd;
+      }
+    </style>
+</head>
+<body>
+  <form method="get" action="{{ url_for('tsv_tool') }}">
+    <button type="submit">Go to TSV Tool</button>
+  </form>
+  <br>
+  <h2>USFM Search</h2>
+  <form method="post" action="{{ url_for('refresh') }}">
+    <button type="submit">Refresh Text Files</button>
+  </form>
+  <br>
+  <form method="post" action="{{ url_for('index') }}#text-results">
+    <label for="book_select">Select your book:</label>
+    <select id="book_select" name="book_select" required>
+      <option value="" disabled {% if not selected_book %}selected{% endif %}>Choose a book</option>
+      {% for book in books %}
+        <option value="{{ book }}" {% if book == selected_book %}selected{% endif %}>{{ book }}</option>
+      {% endfor %}
+    </select>
+
+        {% set sel_books = selected_books or [] %}
+
+        <div style="float: right; margin-left: 20px;">
+          <p><strong>Select books to search:</strong></p>
+          <div id="book-buttons" style="display: flex; flex-wrap: wrap; gap: 5px;">
+            <!-- "All" button -->
+            <label class="btn">
+              <input type="checkbox" name="book_buttons" value="All" {% if 'All' in sel_books %}checked{% endif %}>
+              <span>All</span>
+            </label>
+
+            {% for book in books %}
+            <label class="btn">
+              <input type="checkbox" name="book_buttons" value="{{ book }}" {% if book in sel_books %}checked{% endif %}>
+              <span>{{ book }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+    <br><br>
+
+    <p><strong>Instructions:</strong><br>
+    Enter either <code>chapter:verse word version stem</code> (where <em>word</em> is the ULT of the Hebrew word; <em>stem</em> is optional)<br>
+    OR <code>H:Hebrew version stem</code> (where <em>Hebrew</em> is consonantal text; <em>stem</em> is optional).</p>
+
+    <label for="input_str">Search texts:</label>
+    <input id="input_str" name="input_str" style="width: 400px;" placeholder="e.g. 3:14 told ust [hiphil] OR H:עבד ult [qal]">
+    <br><br>
+
+    <input type="submit" value="Search">
+  </form>
+
+  <hr>
+<h2>Note Lookup</h2>
+
+  <form method="post" action="{{ url_for('refresh_notes') }}">
+    <button type="submit">Refresh Note Files</button>
+  </form>
+
+    <p><strong>Instructions:</strong><br>
+    Enter the last bit of the SupRef (e.g., <code>pronouns</code> or <code>metaphor</code>) or the word <code>none</code>,<br>
+    the desired word or phrase (if phrase, must be surrounded by straight quotes, e.g., <code>"in my heart"</code>) or no phrase (just straight quotes, e.g. <code>""</code>,<br>
+    and optionally, the biblical book to search in (e.g., <code>1 Kings</code>).<br>
+    If you select "Regex", you can use expression terms (e.g., <code>.+</code> or <code>\b</code>) in the phrase to search for (in quotes).<br>
+    NOTE: You can put in a scripture citation in the word or phrase slot (e.g., <code>"3:14"</code>), and it will return all notes from that verse (and perhaps some other stray ones as well, haha).</p>
+
+<form method="post" action="{{ url_for('index') }}#note-results">
+  <label for="note_query">Search notes:</label>
+  <input id="note_query" name="note_query" style="width: 400px;" placeholder="e.g. metaphor hearts [Numbers]">
+
+  <label for="use_regex" style="margin-left: 10px;">
+    <input type="checkbox" id="use_regex" name="use_regex" value="1" {% if session.get('use_regex') %}checked{% endif %}>
+    Regex
+  </label>
+
+  <br><br>
+  <input type="submit" value="Search Notes">
+</form>
+
+  {% if result %}
+    <h3 id="text-results">Text Results:</h3>
+    <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ result | safe }}</pre>
+  {% endif %}
+
+{% if note_result %}
+  <h3 id="note-results">Note Results:</h3>
+  <pre style="white-space: pre-wrap; word-wrap: break-word;">{{ note_result | safe }}</pre>
+{% endif %}
+
+{% if logs %}
+  <h3>Text Files Download Logs:</h3>
+  <ul>
+    {% for line in logs %}
+      <li>{{ line }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if note_logs %}
+  <h3>Note Files Download Logs:</h3>
+  <ul>
+    {% for line in note_logs %}
+      <li>{{ line }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+</body>
+
+</html>

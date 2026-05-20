@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TSV Tool</title>
+</head>
+<body>
+  <h1>TSV Tool</h1>
+  <form method="post">
+    <label for="book_name">Book:</label>
+    <select name="book_name" id="book_name" required>
+    {% for book in books %}
+        <option value="{{ book }}" {% if book == selected_book %}selected{% endif %}>{{ book }}</option>
+    {% endfor %}
+    </select>
+    <br><br>
+
+    <label for="tsv_content">Paste TSV data:</label><br>
+    <textarea name="tsv_content" id="tsv_content" rows="15" cols="80" required></textarea>
+    <br><br>
+
+    <button type="submit">Run</button>
+  </form>
+
+  <br><br>
+  <form action="/" method="get">
+      <button type="submit">Return to Searching</button>
+  </form>
+
+    {% if update_complete %}
+      <h2>Update complete.</h2>
+
+      <form action="/download-tsv" method="get" style="display:inline;">
+        <input type="hidden" name="book_name" value="{{ selected_book }}">
+        <button type="submit">Download TSV File</button>
+      </form>
+
+      <form action="/download-all" method="get" style="display:inline; margin-left: 10px;">
+        <input type="hidden" name="book_name" value="{{ selected_book }}">
+        <button type="submit">Download All Data Files</button>
+      </form>
+
+      <h3>Processed TSV Output</h3>
+      <textarea rows="15" cols="80" readonly style="white-space: pre-wrap; font-family: monospace;">{{ output_data | e }}</textarea>
+    {% endif %}
+
+</body>
+</html>
