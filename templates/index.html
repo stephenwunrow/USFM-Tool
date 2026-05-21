@@ -32,9 +32,19 @@
     </style>
 </head>
 <body>
-  <form method="get" action="{{ url_for('tsv_tool') }}">
-    <button type="submit">Go to TSV Tool</button>
-  </form>
+
+  <div style="display: flex; gap: 10px; align-items: center;">
+
+    <form method="get" action="{{ url_for('tsv_tool') }}">
+      <button type="submit">TSV Tools</button>
+    </form>
+
+    <form method="get" action="{{ url_for('translations') }}">
+      <button type="submit">Translations</button>
+    </form>
+
+  </div>
+
   <br>
   <h2>USFM Search</h2>
   <form method="post" action="{{ url_for('refresh') }}">
