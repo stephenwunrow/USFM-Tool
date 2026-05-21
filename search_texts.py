@@ -18,20 +18,25 @@ def normalize_query(query: str):
 
     return query, False
 
-def highlight_text(text, query, is_phrase):
+def highlight_text(text, query, is_regex_mode):
     """
     Wrap matches in HTML span for styling
     """
 
-    if is_phrase:
-        pattern = re.compile(re.escape(query), re.IGNORECASE)
+    escaped_text = html.escape(text)
+
+    if is_regex_mode:
+        try:
+            pattern = re.compile(query, re.IGNORECASE)
+        except re.error:
+            return escaped_text
     else:
         pattern = re.compile(rf"\b{re.escape(query)}\b", re.IGNORECASE)
 
     def replacer(match):
-        return f"<span class='highlight'>{html.escape(match.group(0))}</span>"
+        return f"<span class='highlight'>{match.group(0)}</span>"
 
-    return pattern.sub(replacer, html.escape(text))
+    return pattern.sub(replacer, escaped_text)
 
 def search_verses(query, version="ULT"):
     """
