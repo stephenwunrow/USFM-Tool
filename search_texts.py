@@ -50,7 +50,7 @@ def search_verses(query, version="ULT"):
     if not os.path.exists(file_path):
         return ["File not found."]
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="mac_roman") as f:
         for line in f:
             original_line = line.rstrip("\n")
 
