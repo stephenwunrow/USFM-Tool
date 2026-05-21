@@ -97,6 +97,7 @@ BOOK_ABBREVIATIONS = {
     "Est": "Esther",
     "Job": "Job",
     "Ps": "Psalms",
+    "Psalm": "Psalms",
     "Prov": "Proverbs",
     "Eccl": "Ecclesiastes",
     "Song": "Song",
@@ -180,25 +181,38 @@ def parse_reference(user_input):
     Parses:
         1 Cor 13:4
         Ps 23:1
-        Psalms 119:105
-        2 Sam 5:3
+        Psalms 119
+        2 Sam 5
     """
 
-    match = re.match(r"^(.*?)\s+(\d+):(\d+)$", user_input.strip())
+    user_input = user_input.strip()
 
-    if not match:
-        raise ValueError(
-            "Input must be in the format 'Book Chapter:Verse'"
-        )
+    # Chapter + verse
+    verse_match = re.match(r"^(.*?)\s+(\d+):(\d+)$", user_input)
 
-    raw_book = match.group(1).strip()
-    chapter = match.group(2)
-    verse = match.group(3)
+    if verse_match:
+        raw_book = verse_match.group(1).strip()
+        chapter = verse_match.group(2)
+        verse = verse_match.group(3)
 
-    book_name = normalize_book_name(raw_book)
+        book_name = normalize_book_name(raw_book)
 
-    return book_name, chapter, verse
+        return book_name, chapter, verse
 
+    # Chapter only
+    chapter_match = re.match(r"^(.*?)\s+(\d+)$", user_input)
+
+    if chapter_match:
+        raw_book = chapter_match.group(1).strip()
+        chapter = chapter_match.group(2)
+
+        book_name = normalize_book_name(raw_book)
+
+        return book_name, chapter, None
+
+    raise ValueError(
+        "Input must be in the format 'Book Chapter' or 'Book Chapter:Verse'"
+    )
 
 def find_verse_in_file(file_path, reference):
 
@@ -215,12 +229,33 @@ def find_verse_in_file(file_path, reference):
 
     return None
 
+def find_chapter_in_file(file_path, chapter):
+
+    verses = []
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f, delimiter="\t")
+
+            for row in reader:
+                ref = row["Reference"].strip()
+
+                if ref.startswith(f"{chapter}:"):
+                    verses.append(
+                        f"<div class='verse'>"
+                        f"<span class='ref'>{ref}</span> "
+                        f"{row['Verse'].strip()}"
+                        f"</div>"
+                    )
+
+    except FileNotFoundError:
+        return None
+
+    return verses
 
 def show_verses(user_input):
 
     book_name, chapter, verse = parse_reference(user_input)
-
-    reference = f"{chapter}:{verse}"
 
     ult_file = os.path.join(
         DATA_DIR,
@@ -232,28 +267,53 @@ def show_verses(user_input):
         f"master_UST_{book_name}.tsv"
     )
 
-    ult_text = find_verse_in_file(ult_file, reference)
-    ust_text = find_verse_in_file(ust_file, reference)
-
     output = []
 
-    if ult_text:
-        output.append(
-            f"<strong>{book_name} {reference} (ULT)</strong>: {ult_text}"
-        )
-    else:
-        output.append(
-            f"<strong>{book_name} {reference} (ULT)</strong>: Verse not found."
-        )
+    # SINGLE VERSE LOOKUP
+    if verse is not None:
 
-    if ust_text:
-        output.append(
-            f"<strong>{book_name} {reference} (UST)</strong>: {ust_text}"
-        )
+        reference = f"{chapter}:{verse}"
+
+        ult_text = find_verse_in_file(ult_file, reference)
+        ust_text = find_verse_in_file(ust_file, reference)
+
+        if ult_text:
+            output.append(
+                f"<strong>{book_name} {reference} (ULT)</strong>: {ult_text}"
+            )
+        else:
+            output.append(
+                f"<strong>{book_name} {reference} (ULT)</strong>: Verse not found."
+            )
+
+        if ust_text:
+            output.append(
+                f"<strong>{book_name} {reference} (UST)</strong>: {ust_text}"
+            )
+        else:
+            output.append(
+                f"<strong>{book_name} {reference} (UST)</strong>: Verse not found."
+            )
+
+    # CHAPTER LOOKUP
     else:
-        output.append(
-            f"<strong>{book_name} {reference} (UST)</strong>: Verse not found."
-        )
+
+        ult_verses = find_chapter_in_file(ult_file, chapter)
+        ust_verses = find_chapter_in_file(ust_file, chapter)
+
+        output.append(f"<h2>{book_name} {chapter} (ULT)</h2>")
+
+        if ult_verses:
+            output.extend(ult_verses)
+        else:
+            output.append("Chapter not found.")
+
+        output.append(f"<h2>{book_name} {chapter} (UST)</h2>")
+
+        if ust_verses:
+            output.extend(ust_verses)
+        else:
+            output.append("Chapter not found.")
 
     result = "\n\n".join(line.lstrip() for line in output)
     return result
