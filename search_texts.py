@@ -84,7 +84,7 @@ def search_verses(query, version="ULT"):
                     match_found = True
 
             if match_found:
-                highlighted_text = highlight_text(verse_text, query, is_phrase)
+                highlighted_text = highlight_text(verse_text, query, is_regex_mode)
 
                 results += (
                     f"<div class='result'>"
