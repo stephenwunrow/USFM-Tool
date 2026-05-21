@@ -160,7 +160,13 @@
 
 
         {% if output %}
-            <div class="output-box">{{ output | safe }}</div>
+            <div class="output-box" id="output">
+                {{ output | safe }}
+            </div>
+
+            <script>
+                window.location.hash = "output";
+            </script>
         {% endif %}
     </div>
 
