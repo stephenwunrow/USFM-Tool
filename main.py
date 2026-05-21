@@ -258,6 +258,7 @@ def translations():
 
         # Run your display texts function here
         output = show_verses(user_input)
+        print(repr(output))
 
     return render_template('translations.html', output=output)
 
