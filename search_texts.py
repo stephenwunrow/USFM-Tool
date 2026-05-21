@@ -38,8 +38,6 @@ def search_verses(query, version="ULT"):
     Searches ULT_for_accordance.txt or UST_for_accordance.txt
     """
 
-    query, is_phrase = normalize_query(query)
-
     file_path = os.path.join(
         DATA_DIR,
         f"{version}_for_accordance.txt"
@@ -50,11 +48,19 @@ def search_verses(query, version="ULT"):
     if not os.path.exists(file_path):
         return ["File not found."]
 
+    is_regex_mode = False
+
+    # Detect quoted regex input
+    if len(query) >= 2 and query[0] == '"' and query[-1] == '"':
+        is_regex_mode = True
+        query = query[1:-1]  # strip quotes
+
+    results = ""
+
     with open(file_path, "r", encoding="mac_roman") as f:
         for line in f:
             original_line = line.rstrip("\n")
 
-            # Split: "Book Chapter:Verse text..."
             parts = original_line.split(" ", 2)
             if len(parts) < 3:
                 continue
@@ -64,12 +70,17 @@ def search_verses(query, version="ULT"):
 
             match_found = False
 
-            if is_phrase:
-                if query.lower() in verse_text.lower():
-                    match_found = True
+            if is_regex_mode:
+                # RAW regex mode
+                try:
+                    if re.search(query, verse_text, re.IGNORECASE):
+                        match_found = True
+                except re.error:
+                    continue
             else:
-                # word match (whole word)
-                if re.search(rf"\b{re.escape(query)}\b", verse_text, re.IGNORECASE):
+                # SAFE word-boundary mode (always \b)
+                pattern = rf"\b{re.escape(query)}\b"
+                if re.search(pattern, verse_text, re.IGNORECASE):
                     match_found = True
 
             if match_found:
