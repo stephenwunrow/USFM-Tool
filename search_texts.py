@@ -49,6 +49,7 @@ def search_verses(query, version="ULT"):
     )
 
     results = ""
+    match_count = 0
 
     if not os.path.exists(file_path):
         return ["File not found."]
@@ -78,15 +79,21 @@ def search_verses(query, version="ULT"):
             if is_regex_mode:
                 # RAW regex mode
                 try:
-                    if re.search(query, verse_text, re.IGNORECASE):
+                    matches = re.findall(query, verse_text, re.IGNORECASE)
+
+                    if matches:
                         match_found = True
+                        match_count += len(matches)
                 except re.error:
                     continue
             else:
                 # SAFE word-boundary mode (always \b)
                 pattern = rf"\b{re.escape(query)}\b"
-                if re.search(pattern, verse_text, re.IGNORECASE):
+                matches = re.findall(pattern, verse_text, re.IGNORECASE)
+
+                if matches:
                     match_found = True
+                    match_count += len(matches)
 
             if match_found:
                 highlighted_text = highlight_text(verse_text, query, is_regex_mode)
@@ -96,5 +103,12 @@ def search_verses(query, version="ULT"):
                     f"<span class='ref'>{book_ref}</span> {highlighted_text}"
                     f"</div>"
                 )
+
+    results = (
+        f"<div class='result-count'>"
+        f"Found {match_count} matches."
+        f"</div>"
+        + results
+    )
 
     return results
