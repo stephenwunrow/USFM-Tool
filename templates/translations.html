@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Translations</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-top: 40px;
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 700px;
+            height: 120px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 18px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .output-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f8f8f8;
+            white-space: pre-wrap;
+            max-width: 900px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Translations</h1>
+
+    <!-- Download Section -->
+    <form method="get" action="{{ url_for('download_accordance') }}">
+        <button type="submit">Download Bibles for Accordance</button>
+    </form>
+
+
+    <!-- Display Texts Section -->
+    <div class="section">
+        <h2>Display Texts</h2>
+
+        <form method="post">
+            <textarea
+                name="user_input"
+                placeholder="Enter your input here..."
+            ></textarea>
+
+            <br><br>
+
+            <button type="submit">Run Script</button>
+        </form>
+
+
+        {% if output %}
+            <div class="output-box">
+                {{ output }}
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

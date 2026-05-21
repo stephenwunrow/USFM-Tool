@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, send_file, abort
 from search import run_web_search, download_text_files
-from texts import main
+from texts import main as build_texts
 from note_lookup import search_notes
 from note_lookup import download_notes_files
 from fix_ats import fix_ats
@@ -135,7 +135,7 @@ def refresh():
 
     try:
         download_text_files(logger=collect_logs)
-        main(logger=collect_logs)
+        build_texts(logger=collect_logs)
         session['refresh_logs'] = logs  # store logs in session temporarily
         session['refresh_message'] = "Data files refreshed successfully."
     except Exception as e:
@@ -160,10 +160,6 @@ def refresh_notes():
         session['note_refresh_message'] = f"Error during refresh: {e}"
 
     return redirect(url_for('index'))
-
-@app.route("/translations")
-def translations():
-    return render_template("translations.html")
 
 @app.route("/tsv-tool", methods=["GET", "POST"])
 def tsv_tool():
@@ -248,6 +244,38 @@ def download_all():
         download_name=f"{book_name}_all_files.zip"
     )
 
+# =========================
+# Translations Routes
+# =========================
+@app.route('/translations', methods=['GET', 'POST'])
+def translations():
+    output = None
+
+    if request.method == 'POST':
+        user_input = request.form.get('user_input', '').strip()
+
+        # Run your display texts function here
+        output = display_texts(user_input)
+
+    return render_template('translations.html', output=output)
+
+@app.route('/download_accordance')
+def download_accordance():
+    output_dir = 'Data/Texts'
+
+    files_to_zip = [
+        os.path.join(output_dir, 'ULT_for_accordance.txt'),
+        os.path.join(output_dir, 'UST_for_accordance.txt')
+    ]
+
+    zip_path = os.path.join(output_dir, 'accordance_bibles.zip')
+
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        for file_path in files_to_zip:
+            if os.path.exists(file_path):
+                zipf.write(file_path, arcname=os.path.basename(file_path))
+
+    return send_file(zip_path, as_attachment=True)
 
 if __name__ == "__main__":
     download_text_files(logger=logger)
