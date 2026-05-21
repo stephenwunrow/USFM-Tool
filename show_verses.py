@@ -239,20 +239,20 @@ def show_verses(user_input):
 
     if ult_text:
         output.append(
-            f"{book_name} {reference} (ULT): {ult_text}"
+            f"<strong>{book_name} {reference} (ULT)</strong>: {ult_text}"
         )
     else:
         output.append(
-            f"{book_name} {reference} (ULT): Verse not found."
+            f"<strong>{book_name} {reference} (ULT)</strong>: Verse not found."
         )
 
     if ust_text:
         output.append(
-            f"{book_name} {reference} (UST): {ust_text}"
+            f"<strong>{book_name} {reference} (UST)</strong>: {ust_text}"
         )
     else:
         output.append(
-            f"{book_name} {reference} (UST): Verse not found."
+            f"<strong>{book_name} {reference} (UST)</strong>: Verse not found."
         )
 
     result = "\n\n".join(line.lstrip() for line in output)

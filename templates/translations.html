@@ -29,6 +29,24 @@
             font-size: 12px;
             cursor: pointer;
         }
+        
+        .input-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .input-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            width: 300px;
+            height: 35px;
+            padding: 6px;
+            font-size: 14px;
+        }
 
         .output-box {
             margin-top: 20px;
@@ -42,11 +60,12 @@
 </head>
 <body>
 
+    <h1>Translations</h1>
+
     <form action="/" method="get">
         <button type="submit">Return to Searching</button>
     </form>
     <br>
-    <h1>Translations</h1>
 
     <!-- Download Section -->
     <form method="get" action="{{ url_for('download_accordance') }}">
@@ -56,24 +75,37 @@
 
     <!-- Display Texts Section -->
     <div class="section">
-        <h2>Display Verse</h2>
+        <h2>Display Verse or Search</h2>
 
-        <form method="post">
-            <input
-                type="text"
-                name="user_input"
-                class="textarea"
-                placeholder="e.g. 1 Thessalonians 4:12"
-            />
+        <form method="post" class="input-row">
 
-            <br><br>
+            <div class="input-block">
+                <label>Verse Lookup</label><br>
+                <input
+                    type="text"
+                    name="verse_input"
+                    placeholder="e.g. 1 Thess 4:12"
+                />
+            </div>
 
-            <button type="submit">Display Verse</button>
+            <div class="input-block">
+                <label>Search</label><br>
+                <input
+                    type="text"
+                    name="search_input"
+                    placeholder='e.g. love or "love your neighbor"'
+                />
+            </div>
+
+            <div style="align-self: end;">
+                <button type="submit">Run</button>
+            </div>
+
         </form>
 
 
         {% if output %}
-            <div class="output-box">{{ output }}</div>
+            <div class="output-box">{{ output | safe }}</div>
         {% endif %}
     </div>
 

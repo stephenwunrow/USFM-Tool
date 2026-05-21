@@ -254,11 +254,16 @@ def translations():
     output = None
 
     if request.method == 'POST':
-        user_input = request.form.get('user_input', '').strip()
 
-        # Run your display texts function here
-        output = show_verses(user_input)
-        print(repr(output))
+        verse_input = request.form.get('verse_input', '').strip()
+        search_input = request.form.get('search_input', '').strip()
+
+        # Priority: search wins if both filled
+        if search_input:
+            output = search_verses(search_input, version="ULT")
+
+        elif verse_input:
+            output = show_verses(verse_input)
 
     return render_template('translations.html', output=output)
 
