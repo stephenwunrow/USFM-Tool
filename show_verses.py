@@ -255,4 +255,5 @@ def show_verses(user_input):
             f"{book_name} {reference} (UST): Verse not found."
         )
 
-    return "\n\n".join(output)
+    result = "\n\n".join(line.lstrip() for line in output)
+    return result
