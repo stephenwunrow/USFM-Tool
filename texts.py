@@ -189,20 +189,23 @@ def create_accordance_bibles():
                 f.write(line + '\n')
         print(f'Created {output_file}')
 
-# === Main Execution ===
-book_list = list(acronym_mapping.keys())
+def main():
+    book_list = list(acronym_mapping.keys())
 
-for book_name in book_list:
-    acronym = acronym_mapping[book_name]
-    for version in ['ULT', 'UST']:
-        print(f"Processing {book_name} ({version})...")
-        usfm_text = read_usfm_file(acronym, version)
-        if usfm_text:
-            verse_data = create_ult(usfm_text, book_name)
-            cleaned_data = cleanup_lines(verse_data)
-            headers = ['Reference', 'Verse']
-            file_name = f'master_{version}_{book_name}.tsv'
-            write_tsv(book_name, file_name, headers, cleaned_data)
+    for book_name in book_list:
+        acronym = acronym_mapping[book_name]
+        for version in ['ULT', 'UST']:
+            print(f"Processing {book_name} ({version})...")
+            usfm_text = read_usfm_file(acronym, version)
+            if usfm_text:
+                verse_data = create_ult(usfm_text, book_name)
+                cleaned_data = cleanup_lines(verse_data)
+                headers = ['Reference', 'Verse']
+                file_name = f'master_{version}_{book_name}.tsv'
+                write_tsv(book_name, file_name, headers, cleaned_data)
 
-print("Creating Bibles for Accordance...")
-create_accordance_bibles()
+    print("Creating Bibles for Accordance...")
+    create_accordance_bibles()
+
+if __name__ == "__main__":
+    main()

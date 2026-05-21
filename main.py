@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, send_file, abort
 from search import run_web_search, download_text_files
+from texts import main
 from note_lookup import search_notes
 from note_lookup import download_notes_files
 from fix_ats import fix_ats
@@ -134,6 +135,7 @@ def refresh():
 
     try:
         download_text_files(logger=collect_logs)
+        main(logger=collect_logs)
         session['refresh_logs'] = logs  # store logs in session temporarily
         session['refresh_message'] = "Data files refreshed successfully."
     except Exception as e:
@@ -158,6 +160,10 @@ def refresh_notes():
         session['note_refresh_message'] = f"Error during refresh: {e}"
 
     return redirect(url_for('index'))
+
+@app.route("/translations")
+def translations():
+    return render_template("translations.html")
 
 @app.route("/tsv-tool", methods=["GET", "POST"])
 def tsv_tool():
