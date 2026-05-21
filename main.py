@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template, session, redirect, u
 from search import run_web_search, download_text_files
 from texts import main as build_texts
 from show_verses import show_verses
-from search_texts import search_texts
+from search_texts import search_verses
 from note_lookup import search_notes
 from note_lookup import download_notes_files
 from fix_ats import fix_ats
@@ -261,7 +261,7 @@ def translations():
 
         # Priority: search wins if both filled
         if search_input:
-            output = search_texts(search_input, version="ULT")
+            output = search_verses(search_input, version="ULT")
 
         elif verse_input:
             output = show_verses(verse_input)

@@ -18,6 +18,21 @@ def normalize_query(query: str):
 
     return query, False
 
+def highlight_text(text, query, is_phrase):
+    """
+    Wrap matches in HTML span for styling
+    """
+
+    if is_phrase:
+        pattern = re.compile(re.escape(query), re.IGNORECASE)
+    else:
+        pattern = re.compile(rf"\b{re.escape(query)}\b", re.IGNORECASE)
+
+    def replacer(match):
+        return f"<span class='highlight'>{html.escape(match.group(0))}</span>"
+
+    return pattern.sub(replacer, html.escape(text))
+
 def search_verses(query, version="ULT"):
     """
     Searches ULT_for_accordance.txt or UST_for_accordance.txt
@@ -65,18 +80,3 @@ def search_verses(query, version="ULT"):
                 )
 
     return results
-
-def highlight_text(text, query, is_phrase):
-    """
-    Wrap matches in HTML span for styling
-    """
-
-    if is_phrase:
-        pattern = re.compile(re.escape(query), re.IGNORECASE)
-    else:
-        pattern = re.compile(rf"\b{re.escape(query)}\b", re.IGNORECASE)
-
-    def replacer(match):
-        return f"<span class='highlight'>{html.escape(match.group(0))}</span>"
-
-    return pattern.sub(replacer, html.escape(text))
