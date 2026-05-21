@@ -107,7 +107,7 @@ def search_verses(query, version="ULT"):
     results = (
         f"<div class='result-count'>"
         f"<span class='ref'>Found {match_count} matches.</span>"
-        f"</div></div>"
+        f"</div>"
         + results
     )
 
