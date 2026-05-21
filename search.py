@@ -6,6 +6,8 @@ import io
 import sys
 import time
 from threading import Thread, Lock
+import subprocess
+import sys
 
 STEM_CODES = {
     "qal": "q",
@@ -366,6 +368,7 @@ def main():
         ).lower()
     if user_input == 'yes':
         download_text_files()
+        subprocess.run([sys.executable, "texts.py"])
     selected_books = None
     while True:
         user_input = input(
