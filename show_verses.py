@@ -318,5 +318,5 @@ def show_verses(user_input):
         else:
             output.append("Chapter not found.")
 
-        result = "\n".join(line.lstrip() for line in output)
+        result = "".join(line.lstrip() for line in output)
         return result
