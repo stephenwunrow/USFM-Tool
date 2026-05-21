@@ -45,7 +45,7 @@ def search_verses(query, version="ULT"):
         f"{version}_for_accordance.txt"
     )
 
-    results = []
+    results = ""
 
     if not os.path.exists(file_path):
         return ["File not found."]
@@ -75,7 +75,7 @@ def search_verses(query, version="ULT"):
             if match_found:
                 highlighted_text = highlight_text(verse_text, query, is_phrase)
 
-                results.append(
+                results += (
                     f"<div class='result'>"
                     f"<span class='ref'>{book_ref}</span> {highlighted_text}"
                     f"</div>"

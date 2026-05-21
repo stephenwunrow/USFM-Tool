@@ -133,13 +133,9 @@
         </form>
 
 
-    <div class="output-box">
-        {% for item in output %}
-            <div class="result">
-                {{ item | safe }}
-            </div>
-        {% endfor %}
-    </div>
+        {% if output %}
+            <div class="output-box">{{ output | safe }}</div>
+        {% endif %}
     </div>
 
 </body>
