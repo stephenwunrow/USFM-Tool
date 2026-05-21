@@ -115,12 +115,14 @@
                     <label>Translation</label><br>
 
                     <label>
-                        <input type="radio" name="version" value="ULT" checked>
+                        <input type="radio" name="version" value="ULT"
+                            {% if version == "ULT" %}checked{% endif %}>
                         ULT
                     </label>
 
                     <label>
-                        <input type="radio" name="version" value="UST">
+                        <input type="radio" name="version" value="UST"
+                            {% if version == "UST" %}checked{% endif %}>
                         UST
                     </label>
                 </div>

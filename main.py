@@ -253,7 +253,9 @@ def download_all():
 @app.route('/translations', methods=['GET', 'POST'])
 def translations():
     output = None
-
+    
+    version = request.form.get('version') or request.args.get('version') or "ULT"
+    
     if request.method == 'POST':
 
         verse_input = request.form.get('verse_input', '').strip()
@@ -266,7 +268,7 @@ def translations():
         elif verse_input:
             output = show_verses(verse_input)
 
-    return render_template('translations.html', output=output)
+    return render_template('translations.html', output=output, version=version)
 
 @app.route('/download_accordance')
 def download_accordance():
