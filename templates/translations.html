@@ -87,6 +87,7 @@
     <form method="get" action="{{ url_for('download_accordance') }}">
         <button type="submit">Download Bibles for Accordance</button>
         <br>
+        <br>
         If you need the latest version of the ULT and UST for Accordance,<br>
         be sure to "Refresh Text Files" on the main page first.<br>
         Once that is done, click this button to download the latest versions.
@@ -108,7 +109,8 @@
                     by chapter and verse to see that verse in the<br>
                     ULT and UST. Type in the full book or standard<br>
                     abbreviation followed by just the chapter<br>
-                    to see the whole chapter in both translations.<br><br>
+                    to see the whole chapter in both translations.<br>
+                    <br>
                     <input
                         type="text"
                         name="verse_input"
@@ -123,7 +125,8 @@
                     the selected version (e.g., love or he loves<br>
                     you). Type in a regex pattern within quote<br>
                     marks to search with regex<br>
-                    (e.g., "And.+will be defiled" or "\bclean\w*\b").<br><br>
+                    (e.g., "And.+will be defiled" or "\bclean\w*\b").<br>
+                    <br>
                     <input
                         type="text"
                         name="search_input"
