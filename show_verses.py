@@ -295,6 +295,9 @@ def show_verses(user_input):
                 f"<strong>{book_name} {reference} (UST)</strong>: Verse not found."
             )
 
+        result = "\n\n".join(line.lstrip() for line in output)
+        return result
+
     # CHAPTER LOOKUP
     else:
 
@@ -315,5 +318,5 @@ def show_verses(user_input):
         else:
             output.append("Chapter not found.")
 
-    result = "\n\n".join(line.lstrip() for line in output)
-    return result
+        result = "\n".join(line.lstrip() for line in output)
+        return result
