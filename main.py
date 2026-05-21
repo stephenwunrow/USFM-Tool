@@ -258,10 +258,11 @@ def translations():
 
         verse_input = request.form.get('verse_input', '').strip()
         search_input = request.form.get('search_input', '').strip()
+        version = request.form.get('version', 'ULT')  # default
 
         # Priority: search wins if both filled
         if search_input:
-            output = search_verses(search_input, version="ULT")
+            output = search_verses(search_input, version)
 
         elif verse_input:
             output = show_verses(verse_input)
