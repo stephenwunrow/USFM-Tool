@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for, send_file, abort
 from search import run_web_search, download_text_files
 from texts import main as build_texts
+from show_verses import show_verses
 from note_lookup import search_notes
 from note_lookup import download_notes_files
 from fix_ats import fix_ats
@@ -135,9 +136,10 @@ def refresh():
 
     try:
         download_text_files(logger=collect_logs)
-        build_texts(logger=collect_logs)
         session['refresh_logs'] = logs  # store logs in session temporarily
         session['refresh_message'] = "Data files refreshed successfully."
+        build_texts()
+        session['refresh_message'] += " Texts built successfully."
     except Exception as e:
         session['refresh_logs'] = []
         session['refresh_message'] = f"Error during refresh: {e}"
@@ -255,7 +257,7 @@ def translations():
         user_input = request.form.get('user_input', '').strip()
 
         # Run your display texts function here
-        output = display_texts(user_input)
+        output = show_verses(user_input)
 
     return render_template('translations.html', output=output)
 
