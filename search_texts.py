@@ -76,7 +76,9 @@ def search_verses(query, version="ULT"):
                 highlighted_text = highlight_text(verse_text, query, is_phrase)
 
                 results.append(
+                    f"<div class='result'>"
                     f"<span class='ref'>{book_ref}</span> {highlighted_text}"
+                    f"</div>"
                 )
 
     return results
