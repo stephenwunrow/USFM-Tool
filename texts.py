@@ -88,7 +88,7 @@ def create_ult(usfm_text, book_name):
     verse_data = []
     text = usfm_text
     text = re.sub(r' \\v', r'\n\\v', text)
-    pattern = re.compile(r'\\w ([^|]*?)\||([“‘{(]+)\\|\*([){}.,:;!?…‘’“”\—\- ]+)')
+    pattern = re.compile(r'w ([^|]*?)\||([“‘{(]+)\\|\*([){}.,:;!?…‘’“”\—\- ]+)')
     for line in text.splitlines():
         if line.startswith('\\c '):
             if verse_words:
