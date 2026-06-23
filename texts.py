@@ -101,9 +101,9 @@ def create_ult(usfm_text, book_name):
         elif line.startswith('\\v '):
             if verse_words:
                 verse_data.append(f'{chapter}:{verse}\t{" ".join(verse_words)}')
-            match = re.search(r'\\v\s+(\d+)', line)
+            match = re.search(r'\\v\s+(\d+-*\d*)', line)
             if match:
-                verse = int(match.group(1))
+                verse = match.group(1)
             verse_words = []
             remainder = line[match.end():].strip()
             matches = pattern.findall(remainder)
@@ -141,6 +141,25 @@ def cleanup_lines(verse_data):
         line = line.strip()
         cleaned_data.append(line)
     return cleaned_data
+
+def verse_bridges(verse_data):
+    bridge_data = []
+    for line in verse_data:
+        matches = re.search(r'^(\d+):(\d+)-(\d+)', line)
+        verse_text = line.split('\t', 1)[1]
+        if matches:
+            chapter = int(matches.group(1))
+            first_verse = int(matches.group(2))
+            last_verse = int(matches.group(3))
+            verses = list(range(first_verse, last_verse + 1))
+            for verse in verses:
+                new_line = f'{chapter}:{verse}\t[vbridge {chapter}:{first_verse}-{last_verse}] {verse_text}'
+                bridge_data.append(new_line)
+        else:
+            bridge_data.append(line)
+    return bridge_data
+            
+
 
 def setup_output(book_name, file_name):
     output_path = 'Data/Texts'
@@ -200,9 +219,10 @@ def main():
             if usfm_text:
                 verse_data = create_ult(usfm_text, book_name)
                 cleaned_data = cleanup_lines(verse_data)
+                bridge_data = verse_bridges(cleaned_data)
                 headers = ['Reference', 'Verse']
                 file_name = f'master_{version}_{book_name}.tsv'
-                write_tsv(book_name, file_name, headers, cleaned_data)
+                write_tsv(book_name, file_name, headers, bridge_data)
 
     print("Creating Bibles for Accordance...")
     create_accordance_bibles()
