@@ -135,8 +135,10 @@ def search_verses(query, version="ULT"):
 
                 results += (
                     f"<div class='result'>"
-                    f"<span class='ref'>{escaped_ref}</span> {highlighted_text}"
-                    f" <button type='button' class='toggle-translation-button' data-target='{other_div_id}' data-translation='{other_version}'>See {other_version}</button>"
+                    f"<div class='result-line'>"
+                    f"<div class='verse-text'><span class='ref'>{escaped_ref}</span> {highlighted_text}</div>"
+                    f"<button type='button' class='toggle-translation-button' data-target='{other_div_id}' data-translation='{other_version}'>See {other_version}</button>"
+                    f"</div>"
                     f"<div class='other-translation' id='{other_div_id}' style='display:none;'>"
                     f"<span class='ref'>{escaped_ref} ({other_version})</span> {other_html}"
                     f"</div>"
