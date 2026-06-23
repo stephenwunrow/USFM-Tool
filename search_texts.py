@@ -147,7 +147,10 @@ def search_verses(query, version="ULT"):
 
     results = (
         f"<div class='result-count'>"
+        f"<div class='count-row'>"
         f"<span class='ref'>Found {match_count} matches.</span>"
+        f"<button type='button' class='toggle-all-translations-button' data-translation='{other_version}'>See all {other_version}</button>"
+        f"</div>"
         f"</div>"
         + results
     )

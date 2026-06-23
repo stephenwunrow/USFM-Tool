@@ -73,6 +73,19 @@
             font-weight: bold;
         }
 
+        .count-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .count-row .toggle-all-translations-button {
+            padding: 4px 10px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
         .result {
             padding: 8px 0;
             border-bottom: 1px solid #eee;
@@ -210,6 +223,19 @@
                             this.textContent = isHidden ? `Hide ${this.getAttribute('data-translation')}` : `See ${this.getAttribute('data-translation')}`;
                         });
                     });
+
+                    const allButton = document.querySelector('.toggle-all-translations-button');
+                    if (allButton) {
+                        allButton.addEventListener('click', function() {
+                            const translation = this.getAttribute('data-translation');
+                            const targets = document.querySelectorAll('.other-translation');
+                            const anyHidden = Array.from(targets).some(target => target.style.display === 'none' || !target.style.display);
+                            targets.forEach(target => {
+                                target.style.display = anyHidden ? 'block' : 'none';
+                            });
+                            this.textContent = anyHidden ? `Hide all ${translation}` : `See all ${translation}`;
+                        });
+                    }
                 });
             </script>
         {% endif %}
