@@ -38,6 +38,33 @@ def highlight_text(text, query, is_regex_mode):
 
     return pattern.sub(replacer, escaped_text)
 
+
+def load_translation_lookup(version):
+    """
+    Build a lookup for verse text by book reference in the given translation.
+    """
+    file_path = os.path.join(DATA_DIR, f"{version}_for_accordance.txt")
+    lookup = {}
+
+    if not os.path.exists(file_path):
+        return lookup
+
+    with open(file_path, "r", encoding="mac_roman") as f:
+        for line in f:
+            original_line = line.rstrip("\n")
+            parts = original_line.split(" ", 2)
+            if len(parts) < 3:
+                continue
+            book_ref = f"{parts[0]} {parts[1]}"
+            lookup[book_ref] = parts[2]
+
+    return lookup
+
+
+def sanitize_id(value: str):
+    return re.sub(r"[^A-Za-z0-9_-]", "-", value.strip()).lower()
+
+
 def search_verses(query, version="ULT"):
     """
     Searches ULT_for_accordance.txt or UST_for_accordance.txt
@@ -48,11 +75,14 @@ def search_verses(query, version="ULT"):
         f"{version}_for_accordance.txt"
     )
 
+    other_version = "UST" if version == "ULT" else "ULT"
+    other_lookup = load_translation_lookup(other_version)
+
     results = ""
     match_count = 0
 
     if not os.path.exists(file_path):
-        return ["File not found."]
+        return "<div class='result-count'><span class='ref'>File not found.</span></div>"
 
     is_regex_mode = False
 
@@ -97,10 +127,19 @@ def search_verses(query, version="ULT"):
 
             if match_found:
                 highlighted_text = highlight_text(verse_text, query, is_regex_mode)
+                escaped_ref = html.escape(book_ref)
+                verse_id = sanitize_id(book_ref)
+                other_text = other_lookup.get(book_ref)
+                other_html = html.escape(other_text) if other_text else "<em>Other translation verse not found.</em>"
+                other_div_id = f"other-{verse_id}"
 
                 results += (
                     f"<div class='result'>"
-                    f"<span class='ref'>{book_ref}</span> {highlighted_text}"
+                    f"<span class='ref'>{escaped_ref}</span> {highlighted_text}"
+                    f" <button type='button' class='toggle-translation-button' data-target='{other_div_id}' data-translation='{other_version}'>See {other_version}</button>"
+                    f"<div class='other-translation' id='{other_div_id}' style='display:none;'>"
+                    f"<span class='ref'>{escaped_ref} ({other_version})</span> {other_html}"
+                    f"</div>"
                     f"</div>"
                 )
 
