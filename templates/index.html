@@ -83,12 +83,26 @@
     <br><br>
 
     <p><strong>Instructions:</strong><br>
-    Enter either <code>chapter:verse word version stem</code> (where <em>word</em> is the ULT of the Hebrew word; <em>stem</em> is optional)<br>
-    OR <code>H:Hebrew version stem</code> (where <em>Hebrew</em> is consonantal text; <em>stem</em> is optional).<br>
-    OR <code>Strongs version stem</code> (where <em>Strongs</em> is H2697; <em>stem</em> is optional).</p>
+    Enter either <code>chapter:verse word stem</code> (where <em>word</em> is the ULT of the Hebrew word; <em>stem</em> is optional)<br>
+    OR <code>H:Hebrew stem</code> (where <em>Hebrew</em> is consonantal text; <em>stem</em> is optional).<br>
+    OR <code>Strongs stem</code> (where <em>Strongs</em> is H2697; <em>stem</em> is optional).<br>
+    Choose <strong>ULT</strong> or <strong>UST</strong> with the toggle to the right.</p>
 
-    <label for="input_str">Search texts:</label>
-    <input id="input_str" name="input_str" style="width: 400px;" placeholder="e.g. 3:14 told ust [hiphil] OR H:עבד ult [qal]">
+    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <label for="input_str">Search texts:</label>
+      <input id="input_str" name="input_str" style="width: 400px;" placeholder="e.g. 3:14 told [hiphil] OR H:עבד [qal]">
+
+      <div role="group" aria-label="Translation version" style="display: flex; gap: 4px;">
+        <label style="display: inline-flex; align-items: center; padding: 2px 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background-color: #f7f7f7;">
+          <input type="radio" name="version_toggle" value="ULT" {% if session.get('search_version', 'ULT') == 'ULT' %}checked{% endif %}>
+          <span style="margin-left: 4px;">ULT</span>
+        </label>
+        <label style="display: inline-flex; align-items: center; padding: 2px 8px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background-color: #f7f7f7;">
+          <input type="radio" name="version_toggle" value="UST" {% if session.get('search_version', 'ULT') == 'UST' %}checked{% endif %}>
+          <span style="margin-left: 4px;">UST</span>
+        </label>
+      </div>
+    </div>
     <br><br>
 
     <input type="submit" value="Search">

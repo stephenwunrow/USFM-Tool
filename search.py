@@ -152,7 +152,15 @@ def download_text_files(logger=add_log):
     logger("Download complete.")
 
 
-def parse_user_input(input_str):
+def normalize_version(version):
+    if not version:
+        return "ult"
+    return version.strip().lower()
+
+
+def parse_user_input(input_str, version=None):
+    selected_version = normalize_version(version)
+
     # Handle Hebrew root lookup form like 'H:עבד [stem]'
     if input_str.startswith("H:"):
         parts = input_str[2:].strip().split()
@@ -160,32 +168,55 @@ def parse_user_input(input_str):
             raise ValueError("Missing word after 'H:'.")
         word = parts[0]
         word = strip_hebrew_vowels(word)
-        version = parts[1].lower()
-        stem = parts[2] if len(parts) > 2 else None
+
+        explicit_version = None
+        stem = None
+        if len(parts) > 1 and parts[1].lower() in {"ult", "ust"}:
+            explicit_version = parts[1].lower()
+            stem = parts[2] if len(parts) > 2 else None
+        elif len(parts) > 1:
+            stem = parts[1]
+
+        version = explicit_version or selected_version
         if stem:
             stem = stem.lower()
         return "H", None, word, version, stem
     elif re.match(r'^H\d', input_str):
         parts = input_str.split()
         word = parts[0].strip()
-        version = parts[1].lower()
-        stem = parts[2] if len(parts) > 2 else None
+
+        explicit_version = None
+        stem = None
+        if len(parts) > 1 and parts[1].lower() in {"ult", "ust"}:
+            explicit_version = parts[1].lower()
+            stem = parts[2] if len(parts) > 2 else None
+        elif len(parts) > 1:
+            stem = parts[1]
+
+        version = explicit_version or selected_version
         if stem:
             stem = stem.lower()
         return "Strong", None, word, version, stem
-    
-        """Extracts chapter, verse, word, version, and optional stem."""
+
     else:
         parts = input_str.strip().split()
-        if len(parts) < 3:
+        if len(parts) < 2:
             raise ValueError(
-                "Input must include chapter:verse, word, and version.")
+                "Input must include chapter:verse and a word.")
 
-        chapter_verse, word, version = parts[:3]
-        stem = parts[3] if len(parts) > 3 else None
+        chapter_verse, word = parts[0], parts[1]
+        stem = None
+        version = selected_version
+
+        if len(parts) >= 3:
+            third_token = parts[2].lower()
+            if third_token in {"ult", "ust"}:
+                version = third_token
+                stem = parts[3].lower() if len(parts) > 3 else None
+            else:
+                stem = third_token
 
         chapter, verse = chapter_verse.split(":")
-        version = version.lower()
         if stem:
             stem = stem.lower()
         return chapter, verse, word, version, stem
@@ -234,6 +265,7 @@ def strip_hebrew_vowels(text):
 
 def search_usfm_files(word_lemma, version, stem, strip_lemma=False, selected_books=None):
     """Search through USFM files and find aligned phrases for a lemma, optionally filtered by stem."""
+    version = normalize_version(version)
     directory = f'Data/en_{version}'
 
     stem_code = STEM_CODES.get(stem) if stem else None
@@ -395,7 +427,7 @@ def main():
     selected_books = None
     while True:
         user_input = input(
-            "Enter input (chapter:verse word version [stem]) or (H:עבד version [stem]) or type 'quit' to exit: "
+            "Enter input (chapter:verse word [stem]) or (H:עבד [stem]) or type 'quit' to exit: "
         ).strip()
         if user_input.lower() == "quit":
             break
@@ -418,7 +450,7 @@ if __name__ == "__main__":
     main()
 
 
-def run_web_search(user_input, file_path, selected_books=None):
+def run_web_search(user_input, file_path, selected_books=None, version=None):
     old_stdout = sys.stdout  # Save the current stdout
     sys.stdout = mystdout = io.StringIO()  # Redirect stdout to a string buffer
 

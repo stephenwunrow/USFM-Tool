@@ -78,6 +78,7 @@ def index():
     note_result = ""
     selected_book = session.get("selected_book", None)
     selected_books = session.get("selected_books", [])
+    selected_version = session.get("search_version", "ULT")
 
     refresh_message = session.pop('refresh_message', None)
     refresh_logs = session.pop('refresh_logs', [])
@@ -100,6 +101,11 @@ def index():
                 selected_books = None
             session["selected_books"] = selected_books
 
+        version_toggle = request.form.get("version_toggle", "ULT").upper()
+        if version_toggle in {"ULT", "UST"}:
+            session["search_version"] = version_toggle
+            selected_version = version_toggle
+
         input_str = request.form.get("input_str", "").strip()
         note_input_str = request.form.get("note_query", "").strip()  # ← matches the input name in your HTML
 
@@ -107,8 +113,8 @@ def index():
         if input_str:
             if selected_book:
                 file_code = acronym_mapping[selected_book]
-                file_path = f"Data/en_ult/{file_code}.usfm"
-                result = run_web_search(input_str, file_path, selected_books=selected_books)
+                file_path = f"Data/en_{selected_version.lower()}/{file_code}.usfm"
+                result = run_web_search(input_str, file_path, selected_books=selected_books, version=selected_version)
             else:
                 result = "Please select a valid book."
 
@@ -123,6 +129,7 @@ def index():
                            books=acronym_mapping.keys(),
                            selected_book=selected_book,
                            selected_books=selected_books,
+                           selected_version=selected_version,
                            message=refresh_message,
                            logs=refresh_logs,
                            note_message=note_refresh_message,
