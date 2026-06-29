@@ -455,7 +455,7 @@ def run_web_search(user_input, file_path, selected_books=None, version=None):
     sys.stdout = mystdout = io.StringIO()  # Redirect stdout to a string buffer
 
     try:
-        chapter, verse, word, version, stem = parse_user_input(user_input)
+        chapter, verse, word, version, stem = parse_user_input(user_input, version=version)
 
         if chapter == "H":  # Hebrew root search
             search_usfm_files(word, version, stem, strip_lemma=True, selected_books=selected_books)
