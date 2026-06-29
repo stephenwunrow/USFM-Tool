@@ -67,7 +67,7 @@
           <div id="book-buttons" style="display: flex; flex-wrap: wrap; gap: 5px;">
             <!-- "All" button -->
             <label class="btn">
-              <input type="checkbox" name="book_buttons" value="All" {% if 'All' in sel_books %}checked{% endif %}>
+              <input type="checkbox" name="book_buttons" value="All" {% if 'All' in sel_books or not sel_books %}checked{% endif %}>
               <span>All</span>
             </label>
 
@@ -84,7 +84,8 @@
 
     <p><strong>Instructions:</strong><br>
     Enter either <code>chapter:verse word version stem</code> (where <em>word</em> is the ULT of the Hebrew word; <em>stem</em> is optional)<br>
-    OR <code>H:Hebrew version stem</code> (where <em>Hebrew</em> is consonantal text; <em>stem</em> is optional).</p>
+    OR <code>H:Hebrew version stem</code> (where <em>Hebrew</em> is consonantal text; <em>stem</em> is optional).<br>
+    OR <code>Strongs version stem</code> (where <em>Strongs</em> is H2697; <em>stem</em> is optional).</p>
 
     <label for="input_str">Search texts:</label>
     <input id="input_str" name="input_str" style="width: 400px;" placeholder="e.g. 3:14 told ust [hiphil] OR H:עבד ult [qal]">
@@ -147,6 +148,56 @@
     {% endfor %}
   </ul>
 {% endif %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const allCheckbox = document.querySelector('#book-buttons input[value="All"]');
+    const bookCheckboxes = Array.from(document.querySelectorAll('#book-buttons input[type="checkbox"]'));
+    const bookButtons = bookCheckboxes.filter(function (checkbox) {
+      return checkbox.value !== 'All';
+    });
+
+    function syncBookSelection() {
+      const anyBookSelected = bookButtons.some(function (checkbox) {
+        return checkbox.checked;
+      });
+
+      if (allCheckbox.checked) {
+        bookButtons.forEach(function (checkbox) {
+          checkbox.checked = false;
+        });
+      } else if (!anyBookSelected) {
+        allCheckbox.checked = true;
+      }
+    }
+
+    allCheckbox.addEventListener('change', function () {
+      if (this.checked) {
+        bookButtons.forEach(function (checkbox) {
+          checkbox.checked = false;
+        });
+      } else if (!bookButtons.some(function (checkbox) {
+        return checkbox.checked;
+      })) {
+        this.checked = true;
+      }
+    });
+
+    bookButtons.forEach(function (checkbox) {
+      checkbox.addEventListener('change', function () {
+        if (this.checked) {
+          allCheckbox.checked = false;
+        } else if (!bookButtons.some(function (otherCheckbox) {
+          return otherCheckbox.checked;
+        })) {
+          allCheckbox.checked = true;
+        }
+      });
+    });
+
+    syncBookSelection();
+  });
+</script>
 
 </body>
 
