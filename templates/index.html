@@ -94,11 +94,11 @@
 
       <div role="group" aria-label="Translation version" style="display: flex; flex-direction: column; gap: 4px;">
         <label style="display: inline-flex; align-items: center; justify-content: center; min-width: 48px; padding: 3px 8px; cursor: pointer; background: none; border: none; color: #000; font-weight: 600;">
-          <input type="radio" name="version_toggle" value="ult" {% if session.get('search_version', 'ult') == 'ult' %}checked{% endif %}>
+          <input type="radio" name="version_toggle" value="ULT" {% if (session.get('search_version', 'ULT') or 'ULT').upper() == 'ULT' %}checked{% endif %}>
           <span style="margin-left: 4px;">ULT</span>
         </label>
         <label style="display: inline-flex; align-items: center; justify-content: center; min-width: 48px; padding: 3px 8px; cursor: pointer; background: none; border: none; color: #000; font-weight: 600;">
-          <input type="radio" name="version_toggle" value="ust" {% if session.get('search_version', 'ult') == 'ust' %}checked{% endif %}>
+          <input type="radio" name="version_toggle" value="UST" {% if (session.get('search_version', 'ULT') or 'ULT').upper() == 'UST' %}checked{% endif %}>
           <span style="margin-left: 4px;">UST</span>
         </label>
       </div>
