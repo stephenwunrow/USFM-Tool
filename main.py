@@ -113,7 +113,7 @@ def index():
         if input_str:
             if selected_book:
                 file_code = acronym_mapping[selected_book]
-                file_path = f"Data/en_{selected_version.lower()}/{file_code}.usfm"
+                file_path = f"Data/en_ult/{file_code}.usfm"
                 result = run_web_search(input_str, file_path, selected_books=selected_books, version=selected_version)
             else:
                 result = "Please select a valid book."
