@@ -165,6 +165,15 @@ def parse_user_input(input_str):
         if stem:
             stem = stem.lower()
         return "H", None, word, version, stem
+    elif re.match(r'^H\d', input_str):
+        parts = input_str.split()
+        word = parts[0].strip()
+        version = parts[1].lower()
+        stem = parts[2] if len(parts) > 2 else None
+        if stem:
+            stem = stem.lower()
+        return "Strong", None, word, version, stem
+    
         """Extracts chapter, verse, word, version, and optional stem."""
     else:
         parts = input_str.strip().split()
@@ -275,18 +284,32 @@ def search_usfm_files(word_lemma, version, stem, strip_lemma=False, selected_boo
                     else:
                         stripped_block = block
                     # Match lemma and optional stem
-                    if re.search(rf'x-lemma="{re.escape(word_lemma)}"', stripped_block) and \
-                       (not stem_code or re.search(rf'x-morph="[^"]*V{re.escape(stem_code)}[^"]*"', stripped_block)):
-                        x_content_match = re.search(r'x-content="(.*?)"',
-                                                    block)
-                        if not x_content_match:
-                            continue
-                        x_content = x_content_match.group(1)
-                        words = re.findall(r'\\w (.*?)\|', block)
-                        if words:
-                            phrase = " ".join(words)
-                            ref = f"{book_code} {chapter_num}:{verse_num}"
-                            phrase_ref_pairs.append((phrase, ref, x_content))
+                    if any(c.isdigit() for c in word_lemma):
+                        if re.search(rf'x-strong="[a-z:]*{re.escape(word_lemma)}"', stripped_block) and \
+                        (not stem_code or re.search(rf'x-morph="[^"]*V{re.escape(stem_code)}[^"]*"', stripped_block)):
+                            x_content_match = re.search(r'x-content="(.*?)"',
+                                                        block)
+                            if not x_content_match:
+                                continue
+                            x_content = x_content_match.group(1)
+                            words = re.findall(r'\\w (.*?)\|', block)
+                            if words:
+                                phrase = " ".join(words)
+                                ref = f"{book_code} {chapter_num}:{verse_num}"
+                                phrase_ref_pairs.append((phrase, ref, x_content))
+                    else:
+                        if re.search(rf'x-lemma="{re.escape(word_lemma)}"', stripped_block) and \
+                        (not stem_code or re.search(rf'x-morph="[^"]*V{re.escape(stem_code)}[^"]*"', stripped_block)):
+                            x_content_match = re.search(r'x-content="(.*?)"',
+                                                        block)
+                            if not x_content_match:
+                                continue
+                            x_content = x_content_match.group(1)
+                            words = re.findall(r'\\w (.*?)\|', block)
+                            if words:
+                                phrase = " ".join(words)
+                                ref = f"{book_code} {chapter_num}:{verse_num}"
+                                phrase_ref_pairs.append((phrase, ref, x_content))
 
     # Group by (reference, x_content), preserving order of discovery
     ref_content_to_phrases = defaultdict(list)
@@ -404,6 +427,8 @@ def run_web_search(user_input, file_path, selected_books=None):
 
         if chapter == "H":  # Hebrew root search
             search_usfm_files(word, version, stem, strip_lemma=True, selected_books=selected_books)
+        if chapter == "Strong":  # Strongs search
+            search_usfm_files(word, version, stem, strip_lemma=False, selected_books=selected_books)
         else:  # Chapter/verse + word search
             word_text = find_word(chapter, verse, word, version, file_path)
             if not word_text:
