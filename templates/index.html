@@ -93,13 +93,13 @@
       <input id="input_str" name="input_str" style="width: 400px;" placeholder="e.g. 3:14 told [hiphil] OR H:עבד [qal]">
 
       <div role="group" aria-label="Translation version" style="display: flex; flex-direction: column; gap: 4px;">
-        <label style="display: inline-flex; align-items: center; justify-content: center; min-width: 48px; padding: 3px 8px; cursor: pointer; background: none; border: none; color: #007bff; font-weight: 600;">
-          <input type="radio" name="version_toggle" value="ULT" {% if session.get('search_version', 'ULT') == 'ULT' %}checked{% endif %} style="display: none;">
-          <span>ULT</span>
+        <label style="display: inline-flex; align-items: center; justify-content: center; min-width: 48px; padding: 3px 8px; cursor: pointer; background: none; border: none; color: #000; font-weight: 600;">
+          <input type="radio" name="version_toggle" value="ULT" {% if session.get('search_version', 'ULT') == 'ULT' %}checked{% endif %}>
+          <span style="margin-left: 4px;">ULT</span>
         </label>
-        <label style="display: inline-flex; align-items: center; justify-content: center; min-width: 48px; padding: 3px 8px; cursor: pointer; background: none; border: none; color: #007bff; font-weight: 600;">
-          <input type="radio" name="version_toggle" value="UST" {% if session.get('search_version', 'ULT') == 'UST' %}checked{% endif %} style="display: none;">
-          <span>UST</span>
+        <label style="display: inline-flex; align-items: center; justify-content: center; min-width: 48px; padding: 3px 8px; cursor: pointer; background: none; border: none; color: #000; font-weight: 600;">
+          <input type="radio" name="version_toggle" value="UST" {% if session.get('search_version', 'ULT') == 'UST' %}checked{% endif %}>
+          <span style="margin-left: 4px;">UST</span>
         </label>
       </div>
     </div>
