@@ -317,7 +317,7 @@ def search_usfm_files(word_lemma, version, stem, strip_lemma=False, selected_boo
                         stripped_block = block
                     # Match lemma and optional stem
                     if any(c.isdigit() for c in word_lemma):
-                        if re.search(rf'x-strong="[a-z:]*{re.escape(word_lemma)}"', stripped_block) and \
+                        if re.search(rf'x-strong="[a-z:]*{re.escape(word_lemma)}[a-z]*"', stripped_block) and \
                         (not stem_code or re.search(rf'x-morph="[^"]*V{re.escape(stem_code)}[^"]*"', stripped_block)):
                             x_content_match = re.search(r'x-content="(.*?)"',
                                                         block)
