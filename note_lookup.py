@@ -94,7 +94,7 @@ def search_notes(user_input, use_regex=False):
                     parts = line.rstrip().rsplit("\t", 1)
                     if len(parts) == 2:
                         prefix, note = parts
-                        if '\\n' in note and keyword.strip().lower() != ':intro':
+                        if '\\n' in note and ':intro' not in keyword.strip().lower():
                             new_chunks = []
                             note = re.sub(r'(###.+?)\\n\\n', r'\1~', note)
                             chunks = note.split('\\n')
@@ -153,7 +153,7 @@ def search_notes(user_input, use_regex=False):
                         parts = line.rstrip().rsplit("\t", 1)
                         if len(parts) == 2:
                             prefix, note = parts
-                            if '\\n' in note and keyword.strip().lower() != ':intro':
+                            if '\\n' in note and ':intro' not in keyword.strip().lower():
                                 new_chunks = []
                                 note = re.sub(r'(###.+?)\\n\\n', r'\1~', note)
                                 chunks = note.split('\\n')
