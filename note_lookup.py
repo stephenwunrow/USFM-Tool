@@ -136,7 +136,7 @@ def search_notes(user_input, use_regex=False):
                             prefix, note = parts
                             if '\\n' in note:
                                 new_chunks = []
-                                note = re.sub(r'(#.+?)\\n\\n', r'\1~', note)
+                                note = re.sub(r'(###.+?)\\n\\n', r'\1~', note)
                                 chunks = note.split('\\n')
                                 for chunk in chunks:
                                     if use_regex:
@@ -151,7 +151,7 @@ def search_notes(user_input, use_regex=False):
                                             new_chunks.append(chunk)
                                         else:
                                             new_chunks.append('…')
-                                note = '\\n'.join(new_chunks)
+                                note = '\n'.join(new_chunks)
                                 note = re.sub(r'~', r'\n\n', note)
                             if use_regex:
                                 highlighted = re.sub(rf'({keyword})', r'<mark>\1</mark>', note, flags=re.IGNORECASE)
