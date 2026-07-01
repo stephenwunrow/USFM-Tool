@@ -2,6 +2,7 @@ import os
 import re
 import requests
 import shlex
+import html
 
 # Mapping of book names to their respective acronyms
 acronym_mapping = {
@@ -53,10 +54,6 @@ def normalize_quotes(s):
     return s
 
 def search_notes(user_input, use_regex=False):
-    import html  # To escape user content if needed
-    import shlex
-    import re
-    import os
 
     user_input = normalize_quotes(user_input)
 
@@ -137,7 +134,25 @@ def search_notes(user_input, use_regex=False):
                         parts = line.rstrip().rsplit("\t", 1)
                         if len(parts) == 2:
                             prefix, note = parts
-                            note = re.sub(r'\\n', r'\n', note)
+                            if '\\n' in note:
+                                new_chunks = []
+                                note = re.sub(r'(#.+?)\\n\\n', r'\1~', note)
+                                chunks = note.split('\\n')
+                                for chunk in chunks:
+                                    if use_regex:
+                                        match = re.search(keyword, chunk, re.IGNORECASE)
+                                        if match:
+                                            new_chunks.append(chunk)
+                                        else:
+                                            new_chunks.append('…')
+                                    else:
+                                        match = re.search(re.escape(keyword), chunk, re.IGNORECASE)
+                                        if match:
+                                            new_chunks.append(chunk)
+                                        else:
+                                            new_chunks.append('…')
+                                note = '\\n'.join(new_chunks)
+                                note = re.sub(r'~', r'\n\n', note)
                             if use_regex:
                                 highlighted = re.sub(rf'({keyword})', r'<mark>\1</mark>', note, flags=re.IGNORECASE)
                             else:
