@@ -65,7 +65,7 @@ def sanitize_id(value: str):
     return re.sub(r"[^A-Za-z0-9_-]", "-", value.strip()).lower()
 
 
-def search_verses(query, version="ULT"):
+def search_verses(query, range_input=None, version="ULT"):
     """
     Searches ULT_for_accordance.txt or UST_for_accordance.txt
     """
@@ -74,6 +74,9 @@ def search_verses(query, version="ULT"):
         DATA_DIR,
         f"{version}_for_accordance.txt"
     )
+    if range_input is not None:
+        range_input = re.sub(r'^(\d) (\w)', r'\1\2', range_input)
+        range_input = re.sub(r'(\w \d+)$', r'\1:', range_input)
 
     other_version = "UST" if version == "ULT" else "ULT"
     other_lookup = load_translation_lookup(other_version)
@@ -102,6 +105,9 @@ def search_verses(query, version="ULT"):
                 continue
 
             book_ref = f"{parts[0]} {parts[1]}"
+            if range_input and not book_ref.lower().startswith(range_input.lower().strip()):
+                continue
+
             verse_text = parts[2]
 
             match_found = False
