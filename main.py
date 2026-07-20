@@ -262,20 +262,35 @@ def translations():
     output = None
     
     version = request.form.get('version') or request.args.get('version') or "ULT"
-    
+    range_input = session.get("range_input", "")
+
     if request.method == 'POST':
 
         verse_input = request.form.get('verse_input', '').strip()
         search_input = request.form.get('search_input', '').strip()
 
+        submitted_range = request.form.get('range_input', '').strip()
+
+        if submitted_range.lower() == "all":
+            session.pop("range_input", None)
+            range_input = ""
+        elif submitted_range:
+            session["range_input"] = submitted_range
+            range_input = submitted_range
+        else:
+            range_input = session.get("range_input", "")
+
         # Priority: search wins if both filled
         if search_input:
-            output = search_verses(search_input, version)
+            output = search_verses(search_input, range_input, version)
 
         elif verse_input:
-            output = show_verses(verse_input)
+            try:
+                output = show_verses(verse_input)
+            except ValueError as e:
+                output = str(e)
 
-    return render_template('translations.html', output=output, version=version)
+    return render_template('translations.html', output=output, version=version, range_input=range_input)
 
 @app.route('/download_accordance')
 def download_accordance():
@@ -296,5 +311,5 @@ def download_accordance():
     return send_file(zip_path, as_attachment=True)
 
 if __name__ == "__main__":
-    download_text_files(logger=logger)
+    # download_text_files(logger=logger)
     app.run(host="0.0.0.0", port=8080)

@@ -144,7 +144,73 @@ BOOK_ABBREVIATIONS = {
     "2 John": "2 John",
     "3 John": "3 John",
     "Jude": "Jude",
-    "Rev": "Revelation"
+    "Rev": "Revelation",
+    "GEN": "Genesis",
+    "EXO": "Exodus",
+    "LEV": "Leviticus",
+    "NUM": "Numbers",
+    "DEU": "Deuteronomy",
+    "JOS": "Joshua",
+    "JDG": "Judges",
+    "RUT": "Ruth",
+    "1SA": "1 Samuel",
+    "2SA": "2 Samuel",
+    "1KI": "1 Kings",
+    "2KI": "2 Kings",
+    "1CH": "1 Chronicles",
+    "2CH": "2 Chronicles",
+    "EZR": "Ezra",
+    "NEH": "Nehemiah",
+    "EST": "Esther",
+    "JOB": "Job",
+    "PSA": "Psalms",
+    "PRO": "Proverbs",
+    "ECC": "Ecclesiastes",
+    "SNG": "Song",
+    "ISA": "Isaiah",
+    "JER": "Jeremiah",
+    "LAM": "Lamentations",
+    "EZK": "Ezekiel",
+    "DAN": "Daniel",
+    "HOS": "Hosea",
+    "JOL": "Joel",
+    "AMO": "Amos",
+    "OBA": "Obadiah",
+    "JON": "Jonah",
+    "MIC": "Micah",
+    "NAM": "Nahum",
+    "HAB": "Habakkuk",
+    "ZEP": "Zephaniah",
+    "HAG": "Haggai",
+    "ZEC": "Zechariah",
+    "MAL": "Malachi",
+    "MAT": "Matthew",
+    "MRK": "Mark",
+    "LUK": "Luke",
+    "JHN": "John",
+    "ACT": "Acts",
+    "ROM": "Romans",
+    "1CO": "1 Corinthians",
+    "2CO": "2 Corinthians",
+    "GAL": "Galatians",
+    "EPH": "Ephesians",
+    "PHP": "Philippians",
+    "COL": "Colossians",
+    "1TH": "1 Thessalonians",
+    "2TH": "2 Thessalonians",
+    "1TI": "1 Timothy",
+    "2TI": "2 Timothy",
+    "TIT": "Titus",
+    "PHM": "Philemon",
+    "HEB": "Hebrews",
+    "JAS": "James",
+    "1PE": "1 Peter",
+    "2PE": "2 Peter",
+    "1JN": "1 John",
+    "2JN": "2 John",
+    "3JN": "3 John",
+    "JUD": "Jude",
+    "REV": "Revelation"
 }
 
 
@@ -187,31 +253,64 @@ def parse_reference(user_input):
 
     user_input = user_input.strip()
 
-    # Chapter + verse
-    verse_match = re.match(r"^(.*?)\s+(\d+):(\d+)$", user_input)
+    if ';' not in user_input and ',' not in user_input:
 
-    if verse_match:
-        raw_book = verse_match.group(1).strip()
-        chapter = verse_match.group(2)
-        verse = verse_match.group(3)
+        # Chapter + verse
+        verse_match = re.match(r"^(.*?)\s+(\d+):(\d+)$", user_input)
 
-        book_name = normalize_book_name(raw_book)
+        if verse_match:
+            raw_book = verse_match.group(1).strip()
+            chapter = verse_match.group(2)
+            verse = verse_match.group(3)
 
-        return book_name, chapter, verse
+            book_name = normalize_book_name(raw_book)
 
-    # Chapter only
-    chapter_match = re.match(r"^(.*?)\s+(\d+)$", user_input)
+            return [(book_name, chapter, verse)]
 
-    if chapter_match:
-        raw_book = chapter_match.group(1).strip()
-        chapter = chapter_match.group(2)
+        # Chapter only
+        chapter_match = re.match(r"^(.*?)\s+(\d+)$", user_input)
 
-        book_name = normalize_book_name(raw_book)
+        if chapter_match:
+            raw_book = chapter_match.group(1).strip()
+            chapter = chapter_match.group(2)
 
-        return book_name, chapter, None
+            book_name = normalize_book_name(raw_book)
+
+            return [(book_name, chapter, None)]
+
+    elif ';' in user_input or ',' in user_input:
+        verses = []
+        book_name = None
+        chapter = None
+        verse = None
+        blocks = re.split(r"[;,]", user_input)
+        for block in blocks:
+            block = block.strip()
+            verse_match = re.match(r"^(.*?)\s+(\d+):(\d+)$", block)
+            if verse_match:
+                raw_book = verse_match.group(1).strip()
+                chapter = verse_match.group(2)
+                verse = verse_match.group(3)
+
+                book_name = normalize_book_name(raw_book)
+                verses.append((book_name, chapter, verse))
+            else:
+                verse_match = re.match(r"^(\d+):(\d+)$", block)
+                if verse_match:
+                    chapter = verse_match.group(1) 
+                    verse = verse_match.group(2)
+                    verses.append((book_name, chapter, verse))
+                else:
+                    verse_match = re.match(r"^(\d+)$", block)
+                    if verse_match:
+                        verse = verse_match.group(1)
+                        verses.append((book_name, chapter, verse))
+        if any(book is None or chap is None for book, chap, verse in verses):
+            raise ValueError("Enter a valid reference.")
+        return verses
 
     raise ValueError(
-        "Input must be in the format 'Book Chapter' or 'Book Chapter:Verse'"
+        "Enter a valid reference."
     )
 
 def find_verse_in_file(file_path, reference):
@@ -255,68 +354,76 @@ def find_chapter_in_file(file_path, chapter):
 
 def show_verses(user_input):
 
-    book_name, chapter, verse = parse_reference(user_input)
+    to_print = []
 
-    ult_file = os.path.join(
-        DATA_DIR,
-        f"master_ULT_{book_name}.tsv"
-    )
+    current_book = None
 
-    ust_file = os.path.join(
-        DATA_DIR,
-        f"master_UST_{book_name}.tsv"
-    )
-
-    output = []
-
-    # SINGLE VERSE LOOKUP
-    if verse is not None:
-
-        reference = f"{chapter}:{verse}"
-
-        ult_text = find_verse_in_file(ult_file, reference)
-        ust_text = find_verse_in_file(ust_file, reference)
-
-        if ult_text:
-            output.append(
-                f"<strong>{book_name} {reference} (ULT)</strong>: {ult_text}"
-            )
-        else:
-            output.append(
-                f"<strong>{book_name} {reference} (ULT)</strong>: Verse not found."
+    for book_name, chapter, verse in parse_reference(user_input):
+        if book_name != current_book:
+            current_book = book_name
+            ult_file = os.path.join(
+                DATA_DIR,
+                f"master_ULT_{book_name}.tsv"
             )
 
-        if ust_text:
-            output.append(
-                f"<strong>{book_name} {reference} (UST)</strong>: {ust_text}"
-            )
-        else:
-            output.append(
-                f"<strong>{book_name} {reference} (UST)</strong>: Verse not found."
+            ust_file = os.path.join(
+                DATA_DIR,
+                f"master_UST_{book_name}.tsv"
             )
 
-        result = "\n\n".join(line.lstrip() for line in output)
-        return result
+        output = []
 
-    # CHAPTER LOOKUP
-    else:
+        # SINGLE VERSE LOOKUP
+        if verse is not None:
 
-        ult_verses = find_chapter_in_file(ult_file, chapter)
-        ust_verses = find_chapter_in_file(ust_file, chapter)
+            reference = f"{chapter}:{verse}"
 
-        output.append(f"<h2>{book_name} {chapter} (ULT)</h2>")
+            ult_text = find_verse_in_file(ult_file, reference)
+            ust_text = find_verse_in_file(ust_file, reference)
 
-        if ult_verses:
-            output.extend(ult_verses)
+            if ult_text:
+                output.append(
+                    f"<strong>{book_name} {reference} (ULT)</strong>: {ult_text}"
+                )
+            else:
+                output.append(
+                    f"<strong>{book_name} {reference} (ULT)</strong>: Verse not found."
+                )
+
+            if ust_text:
+                output.append(
+                    f"<strong>{book_name} {reference} (UST)</strong>: {ust_text}"
+                )
+            else:
+                output.append(
+                    f"<strong>{book_name} {reference} (UST)</strong>: Verse not found."
+                )
+
+            result = "\n\n".join(line.lstrip() for line in output)
+            to_print.append(result)
+
+        # CHAPTER LOOKUP
         else:
-            output.append("Chapter not found.")
 
-        output.append(f"<h2>{book_name} {chapter} (UST)</h2>")
+            ult_verses = find_chapter_in_file(ult_file, chapter)
+            ust_verses = find_chapter_in_file(ust_file, chapter)
 
-        if ust_verses:
-            output.extend(ust_verses)
-        else:
-            output.append("Chapter not found.")
+            output.append(f"<h2>{book_name} {chapter} (ULT)</h2>")
 
-        result = "".join(line.lstrip() for line in output)
-        return result
+            if ult_verses:
+                output.extend(ult_verses)
+            else:
+                output.append("Chapter not found.")
+
+            output.append(f"<h2>{book_name} {chapter} (UST)</h2>")
+
+            if ust_verses:
+                output.extend(ust_verses)
+            else:
+                output.append("Chapter not found.")
+
+            result = "".join(line.lstrip() for line in output)
+            to_print.append(result)
+
+    return "\n\n\n".join(to_print)
+    
